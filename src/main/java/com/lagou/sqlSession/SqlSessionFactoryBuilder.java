@@ -2,10 +2,13 @@ package com.lagou.sqlSession;
 
 import com.lagou.config.XMLConfigBuilder;
 import com.lagou.pojo.Configuration;
+import com.lagou.pojo.MappedStatement;
 import org.dom4j.DocumentException;
 
 import java.beans.PropertyVetoException;
 import java.io.InputStream;
+import java.util.Map;
+import java.util.Set;
 
 /**
  *

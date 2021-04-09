@@ -34,12 +34,10 @@ public class DefaultExecutor implements  Executor {
 
         Class<?> paramClass = Class.forName(mappedStatement.getParamterType());
 
-        Object param = params[0];
-
         for (int i = 0; i < parameterMappingList.size(); i++) {
             Field declaredField = paramClass.getDeclaredField(parameterMappingList.get(i).getContent());
             declaredField.setAccessible(Boolean.TRUE);
-            Object value = declaredField.get(param);
+            Object value = declaredField.get(params[0]);
             preparedStatement.setObject(i+1, value);
         }
 
@@ -67,6 +65,34 @@ public class DefaultExecutor implements  Executor {
             objects.add(o);
         }
         return (List<E>) objects;
+    }
+
+    public Integer executeUpdate(Configuration configuration, MappedStatement mappedStatement, Object... params) throws Exception {
+        //获取连接
+        Connection connection = configuration.getDataSource().getConnection();
+
+        //获取sql
+        String sql = mappedStatement.getSql();
+
+        //对sql进行解析， 1.将自定义#{}占位符用JDBC定义占位符？替换， 2.获取#{}里面参数的值， 用于sql预处理时候设置参数
+        BoundSql boundSql = getBoundSql(sql);
+
+        PreparedStatement preparedStatement = connection.prepareStatement(boundSql.getSqlText());
+
+        List<ParameterMapping> parameterMappingList = boundSql.getParameterMappingList();
+
+        Class<?> paramClass = Class.forName(mappedStatement.getParamterType());
+
+        for (int i = 0; i < parameterMappingList.size(); i++) {
+            Field declaredField = paramClass.getDeclaredField(parameterMappingList.get(i).getContent());
+            declaredField.setAccessible(Boolean.TRUE);
+            Object value = declaredField.get(params[0]);
+            preparedStatement.setObject(i+1, value);
+        }
+
+        //参数封装完执行sql获取结果集
+        int i = preparedStatement.executeUpdate();
+        return  i;
     }
 
     private BoundSql getBoundSql(String sql){

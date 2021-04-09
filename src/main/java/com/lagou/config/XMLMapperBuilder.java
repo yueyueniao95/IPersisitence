@@ -26,6 +26,15 @@ public class XMLMapperBuilder {
 
         List<Element> list = rootElement.selectNodes("//select");
 
+        //增加修改删除更新标签解析
+        List<Element> deleteList = rootElement.selectNodes("//delete");
+        List<Element> saveList = rootElement.selectNodes("//save");
+        List<Element> updateList = rootElement.selectNodes("//update");
+
+        list.addAll(deleteList);
+        list.addAll(saveList);
+        list.addAll(updateList);
+
         for (Element element : list) {
             MappedStatement mappedStatement = new MappedStatement();
             mappedStatement.setId(element.attributeValue("id"));
@@ -35,7 +44,6 @@ public class XMLMapperBuilder {
             String key = rootElement.attributeValue("namespace")+"."+mappedStatement.getId();
             configuration.getMappedStatementMap().put(key, mappedStatement);
         }
-
     }
 
 }
